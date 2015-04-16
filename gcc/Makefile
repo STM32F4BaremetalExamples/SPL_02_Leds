@@ -1,4 +1,4 @@
-INCLUDE_DIRS:= device/include cmsis/include ../include ../STM32F4xx_StdPeriph_Driver/src ../STM32F4xx_StdPeriph_Driver/inc 
+INCLUDE_DIRS:= device/include cmsis/include ../include ../STM32F4xx_StdPeriph_Driver/inc 
 SOURCE_DIRS:=  device/source ../source ../STM32F4xx_StdPeriph_Driver/src
 
 #All the dtandard peripherial library files
