@@ -51,9 +51,9 @@ clean:
 	rm -fr objects
 rebuild: clean all
 burn: salida.elf
-	openocd -f board/st_nucleo_f401re.cfg -c"init" -c"reset" -c"sleep 300" -c"reset halt" -c"sleep 300" -c"flash write_image erase salida.elf 0x00 elf" -c"reset" -c"shutdown"
+	openocd -f board/st_nucleo_f4.cfg -c"init" -c"reset" -c"sleep 300" -c"reset halt" -c"sleep 300" -c"flash write_image erase salida.elf 0x00 elf" -c"reset" -c"shutdown"
 debug: salida.elf
-	openocd -f board/st_nucleo_f401re.cfg &>/dev/null & 
+	openocd -f board/st_nucleo_f4.cfg &>/dev/null &
 	sleep 1 ;
 	! echo "reset" | telnet localhost 4444 ;
 	! echo "reset halt" | telnet localhost 4444 ;
