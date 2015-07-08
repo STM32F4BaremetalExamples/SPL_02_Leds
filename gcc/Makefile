@@ -26,7 +26,7 @@ LFLAGS:= $(patsubst %,-L%,$(LIB_DIRS)) $(patsubst %,-l%,$(LIB_NAMES)) -T$(LD_SCR
 DEFINES:= USE_STDPERIPH_DRIVER
 DEFINE_FLAGS:=$(patsubst %,-D%,$(DEFINES))
 INCLUDE_FLAGS:=$(patsubst %,-I%,$(INCLUDE_DIRS)) 
-CFLAGS= -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -std=c99 -g -O1 -Wall 
+CFLAGS= -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16 -std=c99 -Wall -g -ffunction-sections -fdata-sections 
 CPPFLAGS= $(INCLUDE_FLAGS) $(DEFINE_FLAGS) -D$(TCHIP) 
 vpath %.h $(INCLUDE_DIRS)
 vpath %.c $(SOURCE_DIRS)
@@ -40,20 +40,21 @@ all: salida.elf
 objects:
 	mkdir objects
 salida.elf: objects $(COBJECTS) $(ASMOBJECTS)
-	$(CC) $(CFLAGS) objects/*.o $(LFLAGS) -o $@
+	$(CC) -Wl,--gc-sections -specs=nano.specs $(CFLAGS) objects/*.o $(LFLAGS) -o $@
+	arm-none-eabi-size $@ ;
 $(COBJECTS): %.o: %.c
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o objects/$@
 $(ASMOBJECTS): %.o: %.S
 	$(CC) $(CFLAGS) $(CPPFLAGS) -c $< -o objects/$@
 .PHONY:clean rebuild burn
 clean:
-	rm -f  *.elf
-	rm -fr objects
+	rm -f  *.elf ;
+	rm -fr objects ;
 rebuild: clean all
 burn: salida.elf
-	openocd -f board/st_nucleo_f4.cfg -c"init" -c"reset" -c"sleep 300" -c"reset halt" -c"sleep 300" -c"flash write_image erase salida.elf 0x00 elf" -c"reset" -c"shutdown"
+	openocd -f board/st_nucleo_f4.cfg -c"init" -c"sleep 300"  -c"program erase salida.elf" -c"sleep 300" -c"reset" -c"shutdown"
 debug: salida.elf
-	openocd -f board/st_nucleo_f4.cfg &>/dev/null &
+	openocd -f board/st_nucleo_f4.cfg &>/dev/null & 
 	sleep 1 ;
 	! echo "reset" | telnet localhost 4444 ;
 	! echo "reset halt" | telnet localhost 4444 ;
